@@ -1,0 +1,77 @@
+* Unit Inverter
+.subckt inv supply Inp Output
+.params widthp = 1.053u
+.params widthn = 0.3161u
+
+*Defining the parameters as a function of width
+.params apd=0.18U*widthp aps=0.18U*widthp ppd=2*widthp+4*0.18U pps=2*widthp+4*0.18U
+.params and=0.18U*widthn ans=0.18U*widthn pnd=2*widthn+4*0.18U pns=2*widthn+4*0.18U
+
+
+* This subcircuit defines a CMOS inverter with equal n and p widths
+MP1 Output Inp Supply Supply cmosp
++ L=0.18U W=widthp AD = apd AS = aps PD = ppd PS = pps
+MN1 Output Inp 0 0 cmosn
++ L=0.18U W=widthn AD = and AS = ans PD = pnd PS = pns
+.ends
+
+
+*Supply voltage
+vdd supply 0 dc 1.8
+
+*Include the model file
+.include models-180nm
+
+*First inverter for realistic rise and fall edge of the signal
+X1 supply pgen 1 inv
+
+*Second inverters to revert the signal back and add more nonlinearity to rise/fall edge
+X2 supply 1 dutin inv
+X3 supply 1 3 inv
+X4 supply 1 3 inv
+X5 supply 1 3 inv
+
+*Capacitive load of these inverters
+C1 3 0 0.1pF
+
+*Device under test
+X6 supply dutin dutout inv
+
+*Test load we will vary this load to gather the slope and intercept
+X71 supply dutout 5 inv
+X72 supply dutout 5 inv
+X73 supply dutout 5 inv
+X74 supply dutout 5 inv
+X75 supply dutout 5 inv
+X76 supply dutout 5 inv
+X77 supply dutout 5 inv
+X78 supply dutout 5 inv
+
+*From the graph we get the slope to be 1.16551605e-11 (Tou) and intercept to be 2.60776779e-11(Ro_inv)
+
+
+
+*Load on load
+X8 supply 5 6 inv
+X9 supply 5 6 inv
+X11 supply 5 6 inv
+X12 supply 5 6 inv
+
+*Capacitance of load on load
+C2 6 0 0.1pF
+
+* pulse with time period of Trep, rise and fall times = Trep/20
+.param Trep= 5n
+.param Trf = {Trep/20.0}
+.param Tw = {Trep/2.0 - Trf}
+.param hival=1.8
+.param loval=0.0
+Vpulse pgen 0 DC 0 PULSE({loval} {hival} {Tw} {Trf} {Trf} {Tw} {Trep})
+
+.tran 1pS {3*Trep} 0nS
+.control
+run
+
+meas tran invdelay1 TRIG v(dutin) VAL=0.9 RISE=2 TARG v(dutout) VAL=0.9 FALL=2
+.endc
+.end

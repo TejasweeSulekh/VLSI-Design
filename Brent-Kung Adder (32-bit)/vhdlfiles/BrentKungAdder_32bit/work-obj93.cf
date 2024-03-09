@@ -1,0 +1,21 @@
+v 4
+file . "adder_tb.vhdl" "4699729a6dfcb336089266102bc51fd3347034c7" "20231007115340.578":
+  entity adder_32b_tb at 3( 78) + 0 on 145;
+  architecture test of adder_32b_tb at 13( 233) + 0 on 146;
+file . "adder32.vhdl" "9166be50fcd32e88b4ab2e7b8b37d336583dc392" "20231007115334.737":
+  entity andgate at 6( 123) + 0 on 129;
+  architecture trivial of andgate at 12( 260) + 0 on 130;
+  entity xorgate at 17( 363) + 0 on 131;
+  architecture trivial of xorgate at 23( 500) + 0 on 132;
+  entity abcgate at 28( 603) + 0 on 133;
+  architecture trivial of abcgate at 34( 742) + 0 on 134;
+  entity cin_map_g at 40( 895) + 0 on 135;
+  architecture trivial of cin_map_g at 46( 1042) + 0 on 136;
+  entity pg_calculation at 51( 1173) + 0 on 137;
+  architecture behavioral of pg_calculation at 62( 1463) + 0 on 138;
+  entity carry_calculation at 89( 2178) + 0 on 139;
+  architecture behavioral of carry_calculation at 99( 2429) + 2 on 140;
+  entity sum_calculation at 113( 2799) + 2 on 141;
+  architecture behavioral of sum_calculation at 123( 3098) + 4 on 142;
+  entity adder_32b at 129( 3290) + 0 on 143;
+  architecture structural of adder_32b at 141( 3563) + 0 on 144;

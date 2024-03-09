@@ -1,0 +1,53 @@
+* Unit Inverter
+.subckt inv supply InpA InpB InpC Output
+.params widthp = 1.053u
+.params widthn = 0.3161u
+
+*Defining the parameters as a function of width
+.params apd=0.18U*widthp aps=0.18U*widthp ppd=2*widthp+4*0.18U pps=2*widthp+4*0.18U
+.params and=0.18U*widthn ans=0.18U*widthn pnd=2*widthn+4*0.18U pns=2*widthn+4*0.18U
+
+
+* This subcircuit defines a CMOS inverter with equal n and p widths
+MPA Output InpA Supply Supply cmosp
++ L=0.18U W=widthp AD = apd AS = aps PD = ppd PS = pps
+MPB BCP InpB Supply Supply cmosp
++ L=0.18U W=widthp AD = apd AS = aps PD = ppd PS = pps
+MPC Output InpC BCP Supply cmosp
++ L=0.18U W=widthp AD = apd AS = aps PD = ppd PS = pps
+
+MNA Output InpA BCN 0 cmosn
++ L=0.18U W=widthn AD = and AS = ans PD = pnd PS = pns
+MNB BCN InpB 0 0 cmosn
++ L=0.18U W=widthn AD = and AS = ans PD = pnd PS = pns
+MNC BCN InpC 0 0 cmosn
++ L=0.18U W=widthn AD = and AS = ans PD = pnd PS = pns
+.ends
+
+
+vdd supply 0 dc 1.8
+
+va a 0 dc 0 PULSE(0 1.8 0nS 20pS 20pS 4nS 8.0nS)
+vb b 0 0.18
+vc c 0 1.62
+
+
+
+* Device under test
+x3 supply a b c dutout inv
+
+* Load Capacitor
+C3 dutout 0 0.05pF
+
+.include models-180nm
+
+.tran 1pS 35nS 0nS
+.control
+run
+plot 4.0+V(a) 8.0+v(b) 12.0+v(c) V(dutout)
+*meas tran inrise TRIG v(ck) VAL=0.18 RISE=2 TARG v(Ck) VAL=1.62 RISE=2
+*meas tran infall TRIG v(ck) VAL=1.62 FALL=2 TARG v(Ck) VAL=0.18 FALL=2
+meas tran drise TRIG v(dutout) VAL=0.18 RISE=2 TARG v(dutout) VAL=1.62 RISE=2
+meas tran dfall TRIG v(dutout) VAL=1.62 FALL=2 TARG v(dutout) VAL=0.18 FALL=2
+.endc
+.end
